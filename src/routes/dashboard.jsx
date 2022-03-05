@@ -8,6 +8,7 @@ import {
   fetchLinkData,
   setUserProfilePhoto,
   updateUser,
+  logout,
 } from "../firebase/firebase";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
@@ -115,9 +116,14 @@ export default function Dashboard() {
     }
   }
 
+  async function handleClickLogout() {
+    await logout();
+  }
+
   return (
     <div>
       <h1>Dashboard</h1>
+      <button onClick={handleClickLogout}>Logout</button>
       <div>
         <input type="file" onChange={handleOnChangeProfileImage} />
         <form action="" onSubmit={handleSubmit}>
