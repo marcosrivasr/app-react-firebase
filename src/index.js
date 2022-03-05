@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./routes/login";
 import Dashboard from "./routes/dashboard";
 import Profile from "./routes/profile";
+import UsernameView from "./routes/usernameView";
 
 ReactDOM.render(
   <BrowserRouter>
@@ -15,6 +16,7 @@ ReactDOM.render(
       <Route path="login" element={<Login />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path=":username" element={<Profile />} />
+      <Route path="choose-username" element={<UsernameView />} />
     </Routes>
   </BrowserRouter>,
   document.getElementById("root")
