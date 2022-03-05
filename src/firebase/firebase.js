@@ -21,12 +21,16 @@ import {
   getBytes,
 } from "firebase/storage";
 
-import * as dotenv from "dotenv";
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_APIKEY,
+  authDomain: process.env.REACT_APP_AUTHDOMAIN,
+  projectId: process.env.REACT_APP_PROJECTID,
+  storageBucket: process.env.REACT_APP_STORAGEBUCKET,
+  messagingSenderId: process.env.REACT_APP_MESSAGINGSENDERID,
+  appId: process.env.REACT_APP_APPID,
+};
 
-dotenv.config();
-
-const firebaseConfig = {};
-
+console.log(process.env.REACT_APP_TEST);
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
@@ -158,4 +162,8 @@ export async function getProfilePhotoUrl(profilePicture) {
     }); */
   console.log({ url });
   return url;
+}
+
+export async function logout() {
+  await auth.signOut();
 }
