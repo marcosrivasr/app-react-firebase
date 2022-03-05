@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import {
   auth,
   existsUsername,
@@ -44,8 +44,8 @@ export default function UsernameView() {
           console.log("Falta username");
         } else {
           setState(6);
-          console.log("Ya tiene username");
-          navigate("/dashboard");
+          console.log("Ya tiene username", state);
+          //navigate("/dashboard");
         }
       } else {
         navigate("/login");
@@ -73,15 +73,15 @@ export default function UsernameView() {
       }
     }
   }
-  function handleFinishProcess() {
-    navigate("dashboard");
-  }
 
   if (state === 6) {
-    <div>
-      <h1>Congratulations! now you can go to the dashboard</h1>
-      <button onClick={handleFinishProcess}>Go to dashboard</button>
-    </div>;
+    return (
+      <div>
+        <h1>Congratulations! now you can go to the dashboard</h1>
+        <button onClick={handleFinishProcess}>Go to dashboard</button>
+        <Link to="/dashboard">Continue</Link>
+      </div>
+    );
   }
 
   if (state === 3) {
@@ -90,9 +90,6 @@ export default function UsernameView() {
         <h1>Bienvenido {setCurrentUser.displayName}, te falta un username</h1>
         <div>
           <input type="text" onInput={handleInputUsername} />
-        </div>
-        <div>
-          <button onClick={handleOnClickContinue}>Continue</button>
         </div>
       </div>
     );

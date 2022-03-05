@@ -115,9 +115,11 @@ export default function Login() {
     );
   }
   if (state === 4) {
-    <div>
-      <button onClick={() => handleAuth()}>Login</button>
-    </div>;
+    return (
+      <div>
+        <button onClick={() => handleAuth()}>Login</button>
+      </div>
+    );
   }
 
   return <div>Loading</div>;
