@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import {
   auth,
@@ -6,13 +6,16 @@ import {
   insertNewLink,
   userExists,
   fetchLinkData,
-  setUserProfilePhoto,
-  updateUser,
   logout,
+  updateLink,
 } from "../firebase/firebase";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import Link from "../components/link";
+import DashboardWrapper from "../components/dashboardWrapper";
+
+import style from "./dashboard.module.css";
+import styleLinks from "../components/link.module.css";
 
 export default function Dashboard() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -49,9 +52,29 @@ export default function Dashboard() {
     }
   }
 
+  function handleOnDeleteLink(docId) {
+    const tmp = links.filter((link) => link.docId !== docId);
+    setLinks([...tmp]);
+  }
+  function handleOnUpdateLink(docId, title, url) {
+    const link = links.find((item) => item.docId === docId);
+    link.title = title;
+    link.url = url;
+    updateLink(docId, link);
+  }
+
   function renderLinks() {
     if (links.length > 0) {
-      return links.map((link) => <Link title={link.title} url={link.url} />);
+      return links.map((link) => (
+        <Link
+          key={link.id}
+          docId={link.docId}
+          title={link.title}
+          url={link.url}
+          onDeleteLink={handleOnDeleteLink}
+          onUpdateLink={handleOnUpdateLink}
+        />
+      ));
     }
   }
 
@@ -78,7 +101,7 @@ export default function Dashboard() {
     addLink();
   }
 
-  function addLink() {
+  async function addLink() {
     if (link && link.url && link.title) {
       const newLink = {
         id: uuid(),
@@ -86,65 +109,41 @@ export default function Dashboard() {
         url: link.url,
         uid: currentUser.uid,
       };
-      insertNewLink({ ...newLink });
+      const res = await insertNewLink({ ...newLink });
+      newLink.docId = res.id;
+      setLink({
+        url: "",
+        title: "",
+      });
       setLinks([...links, newLink]);
     }
   }
 
-  function handleOnChangeProfileImage(e) {
-    console.log(e.target);
-
-    var fileList = e.target.files;
-    var fileReader = new FileReader();
-
-    if (fileReader && fileList && fileList.length) {
-      fileReader.readAsArrayBuffer(fileList[0]);
-      fileReader.onload = async function () {
-        var imageData = fileReader.result;
-
-        const res = await setUserProfilePhoto(currentUser.uid, imageData);
-
-        if (res) {
-          const tmpUser = { ...currentUser };
-          tmpUser.profilePicture = res.metadata.fullPath;
-          setCurrentUser({ ...tmpUser });
-          debugger;
-          await updateUser(currentUser);
-          //updateUserProfilePhoto(currentUser.uid, res.fullPath);
-        }
-      };
-    }
-  }
-
-  async function handleClickLogout() {
-    await logout();
-  }
-
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <button onClick={handleClickLogout}>Logout</button>
-      <div>
-        <input type="file" onChange={handleOnChangeProfileImage} />
-        <form action="" onSubmit={handleSubmit}>
-          Title
-          <input
-            type="text"
-            name="title"
-            onInput={handleInput}
-            value={link.title}
-          />
-          URL
-          <input
-            type="text"
-            name="url"
-            onInput={handleInput}
-            value={link.url}
-          />
-          <input type="submit" value="Añadir link" />
-        </form>
-      </div>
-      <div>{renderLinks()}</div>
-    </div>
+    <DashboardWrapper>
+      <h2>Dashboard</h2>
+
+      <form action="" onSubmit={handleSubmit} className={style.entryContainer}>
+        <label>Title</label>
+        <input
+          type="text"
+          name="title"
+          onInput={handleInput}
+          value={link.title}
+          autoComplete={false}
+        />
+        <label>URL</label>
+        <input
+          type="text"
+          name="url"
+          onInput={handleInput}
+          value={link.url}
+          autoComplete={false}
+        />
+        <input type="submit" value="Añadir link" className="btn" />
+      </form>
+
+      <div className={styleLinks.linksContainer}>{renderLinks()}</div>
+    </DashboardWrapper>
   );
 }
