@@ -11,6 +11,7 @@ import {
   query,
   where,
   setDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import {
@@ -30,14 +31,11 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_APPID,
 };
 
-console.log(process.env.REACT_APP_TEST);
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore();
 export const storage = getStorage();
-
-export function addNewEntry() {}
 
 export async function registerNewUser(user) {
   try {
@@ -79,8 +77,11 @@ export async function fetchLinkData(uid) {
 
   querySnapshot.forEach((doc) => {
     // doc.data() is never undefined for query doc snapshots
-    console.log(doc.id, " => ", doc.data());
-    links.push(doc.data());
+    const link = { ...doc.data() };
+    link.docId = doc.id;
+    //console.log(doc.id, " => ", doc.data());
+    console.log(link);
+    links.push(link);
   });
   return links;
 }
@@ -88,7 +89,8 @@ export async function fetchLinkData(uid) {
 export async function insertNewLink(link) {
   try {
     const linksRef = collection(db, "links");
-    await addDoc(linksRef, link);
+    const res = await addDoc(linksRef, link);
+    return res;
   } catch (e) {
     console.error("Error adding document: ", e);
   }
@@ -166,4 +168,13 @@ export async function getProfilePhotoUrl(profilePicture) {
 
 export async function logout() {
   await auth.signOut();
+}
+
+export async function deleteLink(docId) {
+  await deleteDoc(doc(db, "links", docId));
+}
+
+export async function updateLink(docId, link) {
+  const res = await setDoc(doc(db, "links", docId), link);
+  console.log("update link", docId, link, res);
 }
