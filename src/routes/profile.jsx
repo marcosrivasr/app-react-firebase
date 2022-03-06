@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
+import Loading from "../components/loading";
+import style from "./profile.module.css";
+import styleLink from "../components/publicLink.module.css";
 import {
   existsUsername,
   getUserPublicProfileInfo,
   getProfilePhotoUrl,
 } from "../firebase/firebase";
+import PublicLink from "../components/publicLink";
 /*
   Stages:
   0: initiated
@@ -51,26 +55,23 @@ export default function Profile() {
   }
 
   if (state === 1) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (
-    <div>
-      <h2>Profile {profile?.profile?.displayName}</h2>
-      <div className="profile">
+    <div className={style.profileContainer}>
+      <div className={style.profilePicture}>
         {profilePhotoUrl ? (
           <img src={profilePhotoUrl} alt="" width="100" />
         ) : (
           ""
         )}
       </div>
-      <div className="links">
+      <h2>@{profile?.profile?.username}</h2>
+      <h2>{profile?.profile?.displayName}</h2>
+      <div className={styleLink.publicLinksContainer}>
         {profile?.links?.map((link) => (
-          <div key={link.id}>
-            <a href={link.url} target="_blank">
-              {link.title}
-            </a>
-          </div>
+          <PublicLink key={link.id} link={link} />
         ))}
       </div>
     </div>
