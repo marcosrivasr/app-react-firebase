@@ -2,18 +2,15 @@ import { useEffect, useState } from "react";
 import {
   auth,
   getUserInfo,
-  read,
-  registerNewUser,
-  updateUser,
   userExists,
+  registerNewUser,
 } from "../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthProvider({
   children,
   onUserLoggedIn,
-  onUserDoesntExist,
   onUserNotLoggedIn,
 }) {
   const navigate = useNavigate();
@@ -27,7 +24,7 @@ export default function AuthProvider({
         if (exists) {
           const loggedUser = await getUserInfo(uid);
 
-          if (loggedUser.username === "") {
+          if (!loggedUser.processCompleted) {
             console.log("Falta username");
             navigate("/choose-username");
           } else {
@@ -35,7 +32,14 @@ export default function AuthProvider({
             onUserLoggedIn(loggedUser);
           }
         } else {
-          onUserDoesntExist();
+          await registerNewUser({
+            uid: user.uid,
+            displayName: user.displayName,
+            profilePicture: "",
+            username: "",
+            processCompleted: false,
+          });
+          navigate("/choose-username");
         }
       } else {
         onUserNotLoggedIn();
