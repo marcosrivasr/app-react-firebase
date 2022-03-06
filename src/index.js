@@ -8,14 +8,19 @@ import Login from "./routes/login";
 import Dashboard from "./routes/dashboard";
 import Profile from "./routes/profile";
 import UsernameView from "./routes/usernameView";
+import LoginV2 from "./routes/loginv2";
+import EditProfile from "./routes/editProfile";
+import SignOut from "./routes/signout";
 
 ReactDOM.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />
-      <Route path="login" element={<Login />} />
+      <Route path="login" element={<LoginV2 />} />
       <Route path="dashboard" element={<Dashboard />} />
-      <Route path=":username" element={<Profile />} />
+      <Route path="dashboard/profile" element={<EditProfile />} />
+      <Route path="signout" element={<SignOut />} />
+      <Route path="u/:username" element={<Profile />} />
       <Route path="choose-username" element={<UsernameView />} />
     </Routes>
   </BrowserRouter>,
