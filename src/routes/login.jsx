@@ -37,13 +37,14 @@ export default function Login() {
           const loggedUser = await getUserInfo(uid);
           console.log("loggedUser", loggedUser);
           setCurrentUser(loggedUser);
-          if (loggedUser.username === "") {
+          if (!loggedUser.processCompleted) {
             console.log("Falta username");
 
             navigate("/choose-username");
             setState(3);
           } else {
             console.log("Ya tiene username");
+            navigate("/dashboard");
             setState(2);
           }
         } else {
@@ -54,6 +55,7 @@ export default function Login() {
             displayName: user.displayName,
             profilePicture: "",
             username: "",
+            processCompleted: false,
           });
 
           setState(3);
