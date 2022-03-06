@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+  useLocation,
+  Link,
+  Navigate,
+} from "react-router-dom";
 import {
   auth,
   existsUsername,
@@ -10,6 +16,7 @@ import {
   updateUser,
   userExists,
 } from "../firebase/firebase";
+import Loading from "../components/loading";
 
 /*
   Stages:
@@ -39,13 +46,12 @@ export default function UsernameView() {
       if (userExists(user.uid)) {
         const loggedUser = await getUserInfo(uid);
         setCurrentUser(loggedUser);
-        if (loggedUser.username === "") {
+        if (!loggedUser.processCompleted) {
           setState(3);
           console.log("Falta username");
         } else {
-          setState(6);
           console.log("Ya tiene username", state);
-          //navigate("/dashboard");
+          navigate("/dashboard");
         }
       } else {
         navigate("/login");
@@ -68,7 +74,9 @@ export default function UsernameView() {
       if (exists) {
         setState(5);
       } else {
-        await updateUser(currentUser);
+        const tmpUser = currentUser;
+        tmpUser.processCompleted = true;
+        await updateUser(tmpUser);
         setState(6);
       }
     }
@@ -78,7 +86,7 @@ export default function UsernameView() {
     return (
       <div>
         <h1>Congratulations! now you can go to the dashboard</h1>
-        <button onClick={handleFinishProcess}>Go to dashboard</button>
+
         <Link to="/dashboard">Continue</Link>
       </div>
     );
@@ -91,9 +99,12 @@ export default function UsernameView() {
         <div>
           <input type="text" onInput={handleInputUsername} />
         </div>
+        <div>
+          <button onClick={handleOnClickContinue}>Continue</button>
+        </div>
       </div>
     );
   }
 
-  return <div>Loading...</div>;
+  return <Loading />;
 }
